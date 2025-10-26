@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>每日祈願・幸運數字＋顏色</title>
+  <meta name="color-scheme" content="dark">
+  <!-- Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== 主題：企業藍 + 靈性漸層 ===== */
+    :root{
+      --bg: #0a0f20;
+      --grad1:#0f1e43; --grad2:#091226;
+      --card:#101b34;
+      --line:#2b3f78;
+      --text:#eaf3ff;
+      --muted:#9fb5d9;
+      --accent:#1e5eff;        /* 主企業藍 */
+      --accent-2:#7aa5ff;      /* 次要亮藍 */
+      --ok:#22c55e; --warn:#f59e0b;
+      --ring: rgba(30,94,255,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text);
+      font-family: "Noto Sans TC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(1200px 800px at 70% -10%, var(--grad1) 0%, var(--bg) 60%),
+        linear-gradient(180deg, var(--grad2), var(--bg));
+      display:grid; place-items:center;
+    }
+    .wrap{width:min(1000px,94vw); padding:28px}
+    h1{margin:0 0 8px;font-size:clamp(22px,3.4vw,32px);letter-spacing:.02em}
+    p.sub{margin:0 0 18px;color:var(--muted)}
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border:1px solid rgba(120,140,200,.18);
+      border-radius:18px; padding:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .row{display:grid;gap:16px;grid-template-columns:1fr}
+    @media(min-width:980px){.row{grid-template-columns:1.25fr .75fr}}
+
+    label{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
+    textarea, input[type="text"]{
+      width:100%; background:#0a142a; color:var(--text);
+      border:1px solid rgba(120,140,200,.3); border-radius:12px;
+      padding:12px 14px; outline:none;
+    }
+    textarea{resize:vertical; min-height:86px}
+    textarea:focus, input[type="text"]:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--ring)}
+    .grid2{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      appearance:none; border:none; cursor:pointer;
+      padding:10px 14px; border-radius:12px; font-weight:700;
+      background:var(--accent); color:#fff; transition:transform .03s ease, opacity .2s;
+    }
+    button.ghost{background:transparent;color:var(--muted); border:1px solid rgba(120,140,200,.35)}
+    button.ok{background:var(--ok)}
+    button.warn{background:var(--warn)}
+    button:active{transform:translateY(1px)}
+
+    .kbd{display:inline-block; border:1px solid rgba(255,255,255,.25); border-bottom-width:2px;
+         padding:.1em .45em; border-radius:8px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.85em}
+
+    .section{margin-top:18px;padding-top:16px;border-top:1px dashed rgba(120,140,200,.25)}
+    .step{font-size:13px;color:var(--muted);margin-bottom:6px}
+
+    .numbers{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+    .pill{
+      padding:8px 12px; border-radius:999px;
+      background:#0f1a31;border:1px solid rgba(120,140,200,.35);
+      font-variant-numeric:tabular-nums; letter-spacing:.02em
+    }
+
+    .colorCard{margin-top:8px;display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:center}
+    .swatch{
+      width:140px;height:84px;border-radius:14px;border:1px solid rgba(255,255,255,.25);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+      transition: filter .8s ease, transform .3s ease;
+    }
+    .breath{ animation: breathe 6s ease-in-out infinite }
+    @keyframes breathe {
+      0%   { transform: scale(1);   filter: brightness(1); }
+      25%  { transform: scale(1.03);filter: brightness(1.08); }
+      50%  { transform: scale(1.06);filter: brightness(1.15); }
+      75%  { transform: scale(1.03);filter: brightness(1.08); }
+      100% { transform: scale(1);   filter: brightness(1); }
+    }
+
+    .kv{color:var(--muted);font-size:14px;line-height:1.6}
+    .kv b{color:var(--text)}
+    .mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>每日祈願 → 幸運數字 → 幸運色</h1>
+    <p class="sub">
+      先寫下「今日新希望」，按下啟動儀式即可得到今日的幸運數字與顏色。<br>
+      快捷：<span class="kbd">Enter</span>/<span class="kbd">R</span> 啟動，
+      <span class="kbd">B</span> 呼吸冥想，
+      <span class="kbd">P</span> 生成分享圖，
+      <span class="kbd">C</span> 複製，
+      <span class="kbd">X</span> 清空。<br>
+      URL 參數：<span class="kbd">?count=6</span>、<span class="kbd">?seed=today</span> 或 <span class="kbd">?seed=文字</span>
+    </p>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="grid2">
+            <div>
+              <label for="wish">今日新希望（只儲存於本機）：</label>
+              <textarea id="wish" placeholder="例：今天心境平穩、遇見善緣、事事順利"></textarea>
+            </div>
+            <div>
+              <label for="author">你的名字／風格標示（會印在分享圖上）：</label>
+              <input id="author" type="text" placeholder="例：BY DATHAN">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="start">啟動儀式（Enter / R）</button>
+            <button class="ghost" id="breath">冥想呼吸 30 秒（B）</button>
+            <button class="ghost" id="copy">複製結果（C）</button>
+            <button class="ghost" id="share">生成分享圖（P）</button>
+            <button class="ghost" id="clear">清空（X）</button>
+          </div>
+
+          <p class="muted" style="margin-top:10px">
+            提示：同一天＋同一祈願（或固定 seed）→ 結果固定；改祈願或隔天會變化。
+          </p>
+        </div>
+
+        <div>
+          <div class="section">
+            <div class="step">步驟一：祈求我的新希望</div>
+            <div id="wishView" class="mono" style="white-space:pre-wrap;color:#dbe8ff"></div>
+          </div>
+
+          <div class="section">
+            <div class="step">步驟二：今日幸運數字（不重複）</div>
+            <div id="nums" class="numbers"></div>
+          </div>
+
+          <div class="section">
+            <div class="step">步驟三：今日幸運色</div>
+            <div class="colorCard">
+              <div id="sw" class="swatch"></div>
+              <div class="kv">
+                <div>色名：<b id="cname">—</b></div>
+                <div>Hex：<b id="chex" class="mono">—</b></div>
+                <div>HSL：<b id="chsl" class="mono">—</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="step">紀錄</div>
+            <div id="log" class="mono" style="font-size:12px;color:#97a9cc"></div>
+          </div>
+	<div class="section">
+	  <div class="step">詳解</div>
+	  <div id="adetail" class="mono" style="font-size:13px; color:#c7d6ff; white-space:pre-wrap;"></div>
+	</div>
+  <div class="section">
+    <div class="step">小語</div>
+    <div id="adviceView" class="mono" style="font-size:14px; color:#eaf3ff;"></div>
+  </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// 僅在 URL 有 ?debug=1 時才彈窗；否則只寫到 console
+const DEBUG = new URLSearchParams(location.search).has('debug');
+
+window.addEventListener('error', (e) => {
+  const src = e.filename || '';
+  const fromExtension =
+    src.startsWith('chrome-extension://') || src.startsWith('moz-extension://');
+  if (fromExtension) return; // 忽略瀏覽器外掛的錯誤（含 MetaMask）
+  const msg = `Script error: ${e.message}\n@ ${src}:${e.lineno}:${e.colno}`;
+  if (DEBUG) alert(msg); else console.warn(msg);
+});
+
+window.addEventListener('unhandledrejection', (e) => {
+  // 訊息字串化
+  const msg = String(e && (e.reason?.message || e.reason || ''));
+  // 忽略常見錢包/外掛噪音
+  if (/metamask|ethereum|wallet|chrome-extension|moz-extension/i.test(msg)) return;
+  if (DEBUG) alert('Promise error: ' + msg);
+  else console.warn('Promise error:', msg);
+});
+
+  /* ===================== 參數與工具 ===================== */
+  const RANGE_MIN = 1, RANGE_MAX = 999999999;
+  const qs = new URLSearchParams(location.search);
+  const COUNT = clampInt(qs.get('count'), 1, 20, 6);
+  const SEED_PARAM = qs.get('seed'); // today / 任意字串 / null
+
+  function clampInt(v, min, max, fallback){
+    const n = parseInt(v, 10);
+    if (Number.isFinite(n) && n>=min && n<=max) return n;
+    return fallback;
+  }
+  function todayKey(){
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+  }
+  // FNV-1a hash
+  function hash32(str){
+    let h = 0x811c9dc5>>>0;
+    for(let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193)>>>0;
+    }
+    return h>>>0;
+  }
+  // 可重現亂數（mulberry32）
+  function mulberry32(a){
+    return function(){
+      a|=0; a = (a + 0x6D2B79F5)|0;
+      let t = Math.imul(a ^ (a>>>15), 1|a);
+      t ^= t + Math.imul(t ^ (t>>>7), 61|t);
+      return ((t ^ (t>>>14))>>>0)/4294967296;
+    }
+  }
+  function getSeed(wish){
+    const key = todayKey();
+    if (SEED_PARAM === 'today') return hash32(key);
+    if (typeof SEED_PARAM === 'string' && SEED_PARAM) return hash32(SEED_PARAM);
+    return hash32(`${key}::${wish}`);
+  }
+// 1~4 位數混合（均勻 25% 機率），不重複，升冪
+function drawUnique1to4(rng, count){
+  const seen = new Set(), out = [];
+  while (out.length < count){
+    const d = 1 + Math.floor(rng()*4);        // 1..4 位
+    const min = (d === 1) ? 1 : Math.pow(10, d - 1);
+    const max = Math.pow(10, d) - 1;
+    const n = Math.floor(rng() * (max - min + 1)) + min;
+    if (!seen.has(n)){ seen.add(n); out.push(n); }
+  }
+  return out.sort((a,b)=>a-b);
+}
+
+
+  // 隨機顏色（整體靈性感，但偏企業藍調和）
+  function pickRandomColor(rng){
+    // hue 0..360；將 30% 機率偏向藍紫區（企業藍系），其餘全域
+    let h = Math.floor(rng()*360);
+    if (rng() < 0.3){ h = 200 + Math.floor(rng()*80); } // 200..280
+    const s = 55 + Math.floor(rng()*21); // 55..75
+    const l = 42 + Math.floor(rng()*21); // 42..62
+    return {h,s,l};
+  }
+  function hslToHex(h,s,l){
+    s/=100; l/=100;
+    const k=n=>(n+h/30)%12;
+    const a=s*Math.min(l,1-l);
+    const f=n=>l - a*Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n),1)));
+    const toHex=x=>Math.round(255*x).toString(16).padStart(2,'0');
+    return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`.toUpperCase();
+  }
+  function colorName(h,s,l){
+    if (s<60 && l>70) return "柔霧灰";
+    const z = Math.round(h/30)%12;
+    return [
+      "熾焰紅","橘晨光","琥珀金","檸檬黃","嫩芽綠","湖沼綠",
+      "蒼翠青","晨海藍","星河藍","暮光靛","薰衣紫","紫羅蘭"
+    ][z];
+  }
+  const fmt = n => n.toLocaleString("zh-Hant");
+
+  /* ===================== DOM ===================== */
+  const $wish = document.getElementById('wish');
+  const $author = document.getElementById('author');
+  const $wishView = document.getElementById('wishView');
+  const $nums = document.getElementById('nums');
+  const $sw = document.getElementById('sw');
+  const $cname = document.getElementById('cname');
+  const $chex = document.getElementById('chex');
+  const $chsl = document.getElementById('chsl');
+  const $log = document.getElementById('log');
+  const $start = document.getElementById('start');
+  const $copy = document.getElementById('copy');
+  const $clear = document.getElementById('clear');
+  const $breath = document.getElementById('breath');
+  const $share = document.getElementById('share');
+
+  // 載入上次祈願與名字
+  $wish.value = localStorage.getItem('daily-wish') || '';
+  $author.value = localStorage.getItem('daily-author') || 'BY DATHAN';
+
+  /* ===================== 主流程 ===================== */
+  let lastState = null; // 儲存供分享圖使用
+
+
+
+// 保險：有 AdviceKit 就用；沒有就退回舊版 buildAdvice()
+function safeAdvice(c, arr, wish){
+  try{
+    if (window.AdviceKit && typeof AdviceKit.buildAdviceRich === 'function'){
+      return AdviceKit.buildAdviceRich(c, arr, wish);
+    }
+  }catch(e){}
+  // 直接回傳預設小語，不再呼叫舊 buildAdvice()
+  return { short: '沉穩觀照・展現熱忱', detail: '' };
+}
+
+
+
+
+  
+  function run(){
+    const wish = ($wish.value || '').trim();
+    const seed = getSeed(wish);
+    const rng = mulberry32(seed);
+
+    // 1) 祈願
+    $wishView.textContent = wish || '（尚未填寫）';
+
+// 2) 幸運數字（1~4 位數混合）
+const arr = drawUnique1to4(rng, COUNT);
+$nums.innerHTML = '';
+arr.forEach(n=>{
+  const el = document.createElement('span');
+  el.className = 'pill';
+  el.textContent = n.toLocaleString("zh-Hant");
+  $nums.appendChild(el);
+});
+
+
+
+    // 3) 幸運色（隨機）
+    const c = pickRandomColor(rng);
+    const hex = hslToHex(c.h, c.s, c.l);
+    $sw.style.background = `hsl(${c.h}deg ${c.s}% ${c.l}%)`;
+    $cname.textContent = colorName(c.h,c.s,c.l);
+    $chex.textContent = hex;
+    $chsl.textContent = `hsl(${c.h}, ${c.s}%, ${c.l}%)`;
+
+    // 4) 小語 + 詳解（保險版）
+const adv = safeAdvice(c, arr, wish);
+document.getElementById('adviceView').textContent = adv.short;
+document.getElementById('adetail').textContent   = adv.detail;
+
+// 紀錄
+const line = `${todayKey()} | ${wish || '（無）'} | [${arr.join(', ')}] | ${hex} / hsl(${c.h},${c.s}%,${c.l}%) | count=${COUNT} seed=${SEED_PARAM||'wish+date'} | ${adv.short}`;
+$log.textContent = line;
+
+
+    // 保存
+    localStorage.setItem('daily-wish', wish);
+    localStorage.setItem('daily-author', ($author.value || '').trim());
+
+    // 分享圖用到
+lastState = {
+  wish, numbers: arr, color: c, hex, colorName: $cname.textContent,
+  date: todayKey(), advice: adv.short, author: ($author.value || '').trim() || 'BY DATHAN'
+};
+
+  }
+
+  function buildAdvice(c){
+  const {h,s,l} = c; // hue, saturation, lightness
+  const poolNeutral   = ["沉穩觀照","保持柔和","專注步伐","回到呼吸","傾聽直覺"];
+  const poolPractical = ["主動示好","善用時機","清晰溝通","完成小目標","善待自己"];
+  const poolSpiritual = ["力量在你心中蘊釀","允許改變發生","對齊內在的節奏","信任宇宙的安排","讓靈感帶路"];
+
+  // 依顏色特徵偏好句庫（I～III 混合）
+  let pick1 = (l >= 55) ? "Practical" : "Neutral";
+  let pick2 = (s >= 65) ? "Spiritual" : "Neutral";
+  if (h >= 200 && h <= 260) pick1 = "Neutral";
+  if (h <= 30 || h >= 330) pick2 = "Practical";
+
+  const take = (arr, n, rng) => {
+    const a = arr.slice();
+
+    for (let i=a.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [a[i],a[j]]=[a[j],a[i]] }
+    return a.slice(0,n);
+  };
+
+  const rng = mulberry32(hash32(`${h}-${s}-${l}`));
+  let bag = [];
+  if (pick1 === "Neutral")   bag.push(...take(poolNeutral,2,rng));
+  if (pick1 === "Practical") bag.push(...take(poolPractical,2,rng));
+  if (pick1 === "Spiritual") bag.push(...take(poolSpiritual,2,rng));
+  if (pick2 === "Neutral")   bag.push(...take(poolNeutral,1,rng));
+  if (pick2 === "Practical") bag.push(...take(poolPractical,1,rng));
+  if (pick2 === "Spiritual") bag.push(...take(poolSpiritual,1,rng));
+
+  const uniq = [...new Set(bag)];
+  return (uniq.length ? uniq.slice(0,2).join("・") : "沉穩觀照・展現熱忱");
+}
+
+
+
+
+  /* ===================== 呼吸冥想 ===================== */
+  let breathTimer = null;
+  function startBreath(){
+    clearBreath();
+    $sw.classList.add('breath');
+    breathTimer = setTimeout(()=>{ $sw.classList.remove('breath'); breathTimer=null; }, 30000);
+  }
+  function clearBreath(){
+    if (breathTimer){ clearTimeout(breathTimer); breathTimer=null; }
+    $sw.classList.remove('breath');
+  }
+
+  /* ===================== 分享圖：1080×1080 PNG ===================== */
+function drawShareCard(state){
+  const size = 1080;
+  const pad  = 80;
+  const rightColW = 300;              // 由 340 → 300 再縮
+  const rightX = size - pad - rightColW;
+  const leftW  = size - pad*2 - rightColW - 56; // 左欄更寬
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // 背景
+  const g = ctx.createLinearGradient(0,0,size,size);
+  g.addColorStop(0, '#0e1938'); g.addColorStop(1, '#070d1f');
+  ctx.fillStyle = g; ctx.fillRect(0,0,size,size);
+  for(let i=0;i<160;i++){
+    const x=Math.random()*size, y=Math.random()*size, r=Math.random()*1.2;
+    ctx.fillStyle=`rgba(200,220,255,${Math.random()*0.55})`;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+  // 內卡片
+  roundRect(ctx, pad, pad, size-2*pad, size-2*pad, 32);
+  ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fill();
+  ctx.strokeStyle='rgba(120,140,200,0.35)'; ctx.lineWidth=2; ctx.stroke();
+
+  // 標題＋日期
+  const tx = pad+24, ty = pad+64;
+  ctx.font='700 42px "Noto Sans TC", sans-serif'; ctx.fillStyle='#eaf3ff';
+  const title='Daily Wish'; ctx.fillText(title, tx, ty);
+  const tWidth = ctx.measureText(title).width;
+  drawHalo(ctx, tx + tWidth + 36, ty-10, 28, '#1e5eff');
+
+  ctx.font='600 30px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  ctx.fillText(state.date, tx, ty+40);
+
+  // ===== 右欄：幸運色（漸層能量色卡 + 更小）=====
+  let ry = pad + 140;
+  ctx.font='600 30px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  ctx.fillText('幸運色', rightX, ry);
+
+// 色卡：260 x 130，離右欄邊緣再內縮 12px
+const swW = 260, swH = 130, swR = 16;
+const swX = rightX + (rightColW - swW) - 50;
+const swY = ry + 18;
+
+  roundRect(ctx, swX, swY, swW, swH, swR);
+  const c1 = `hsl(${state.color.h} ${Math.min(state.color.s+10,100)}% ${Math.min(state.color.l+8,95)}%)`;
+  const c2 = `hsl(${(state.color.h+25)%360} ${Math.max(state.color.s-10,0)}% ${Math.max(state.color.l-6,0)}%)`;
+  const gg = ctx.createLinearGradient(swX, swY, swX+swW, swY+swH);
+  gg.addColorStop(0, c1); gg.addColorStop(1, c2);
+  ctx.fillStyle=gg; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.stroke();
+  // 內亮暈
+  ctx.save();
+  ctx.globalCompositeOperation='lighter';
+  ctx.fillStyle='rgba(255,255,255,0.08)';
+  roundRect(ctx, swX+8, swY+8, swW-16, swH-16, swR-6); ctx.fill();
+  ctx.restore();
+
+  // 色名＆數值
+  ry = swY + swH + 30;
+  ctx.font='600 28px "Noto Sans TC", sans-serif'; ctx.fillStyle='#eaf3ff';
+  ctx.fillText(state.colorName, rightX, ry);
+  ry += 32;
+  ctx.font='400 26px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  const hex = hslToHex(state.color.h, state.color.s, state.color.l);
+  ctx.fillText(`Hex ${hex}`, rightX, ry); ry += 30;
+  ctx.fillText(`HSL ${state.color.h}, ${state.color.s}%, ${state.color.l}%`, rightX, ry);
+
+  // ===== 左欄：祈願 → 幸運數字 → 小語 =====
+  let lx = pad+24, ly = pad + 160;
+
+  // 祈願
+  ctx.font='600 30px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  ctx.fillText('今日祈願', lx, ly);
+  ly += 48;
+  const wishH = drawParagraphH(ctx, state.wish || '（尚未填寫）',
+                               lx, ly, leftW, 42,
+                               '400 34px "Noto Sans TC"', '#eaf3ff');
+  ly += wishH + 56; // 與數字錯開
+
+  // 幸運數字（3 欄網格；此處保證回報高度）
+  ctx.font='600 30px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  ctx.fillText('幸運數字', lx, ly);
+  ly += 50;
+  const gridInfo = drawNumbersGrid(ctx, state.numbers, lx, ly, leftW, {
+    cols: 3, rowGap: 36, colGap: 36, font: '700 44px "Noto Sans TC"', color: '#7aa5ff'
+  });
+  ly += gridInfo.height + 56; // 與小語錯開
+
+  // 小語
+  ctx.font='600 30px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  ctx.fillText('小語', lx, ly);
+  ly += 44;
+  drawParagraphH(ctx, state.advice || "沉穩觀照・展現熱忱",
+                 lx, ly, leftW, 40,
+                 '600 32px "Noto Sans TC"', '#eaf3ff');
+
+  // 作者
+  ctx.font='700 26px "Noto Sans TC", sans-serif'; ctx.fillStyle='#9fb5d9';
+  const by = state.author || 'BY DATHAN';
+  ctx.fillText(by, size - pad - 24 - ctx.measureText(by).width, size - pad - 24);
+
+  return canvas;
+}
+
+
+
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawWrappedText(ctx, text, x, y, size, color){
+    ctx.font = `600 ${size}px "Noto Sans TC", sans-serif`;
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
+
+function drawParagraphH(ctx, text, x, y, maxWidth, lineHeight, font, color){
+  ctx.font = font; ctx.fillStyle = color;
+  const words = text.toString().split(/(\s+)/);
+  let line = '', yy = y, lines = 0;
+  for (let i=0;i<words.length;i++){
+    const test = line + words[i];
+    if (ctx.measureText(test).width > maxWidth && i>0){
+      ctx.fillText(line, x, yy); yy += lineHeight; line = words[i]; lines++;
+    } else { line = test; }
+  }
+  if (line){ ctx.fillText(line, x, yy); lines++; }
+  return Math.max(lines,1) * lineHeight;
+}
+
+  function drawHalo(ctx, cx, cy, r, color){
+    // 外環
+    ctx.save();
+    const g = ctx.createRadialGradient(cx,cy,r*0.4, cx,cy,r*1.6);
+    g.addColorStop(0, 'rgba(122,165,255,0.8)');
+    g.addColorStop(1, 'rgba(122,165,255,0.0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx,cy,r*1.6,0,Math.PI*2); ctx.fill();
+
+    // 主環
+    ctx.strokeStyle = color; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+
+    // 星芒
+    ctx.fillStyle = '#eaf3ff';
+    for(let i=0;i<6;i++){
+      const a = (i/6)*Math.PI*2;
+      const x = cx + Math.cos(a)*r;
+      const y = cy + Math.sin(a)*r;
+      ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+// 幸運數字：三欄網格 → 回傳 {height}
+function drawNumbersGrid(ctx, nums, x, y, width, opt){
+  const { cols=3, rowGap=32, colGap=28, font, color } = opt || {};
+  ctx.font = font || '700 44px "Noto Sans TC", sans-serif';
+  ctx.fillStyle = color || '#7aa5ff';
+
+  // 正確取字級做行高
+  const m = /(\d+)px/.exec(ctx.font);
+  const lineH = ((m ? parseInt(m[1],10) : 44) + 4); // 字級 + 微調
+  const colW  = (width - (cols - 1) * colGap) / cols;
+
+  nums.forEach((n, i)=>{
+    const r = Math.floor(i / cols), c = i % cols;
+    const xx = x + c * (colW + colGap);
+    const yy = y + r * (lineH + rowGap);
+    ctx.fillText(n.toLocaleString('zh-Hant'), xx, yy);
+  });
+
+  const rows = Math.ceil(nums.length / cols);
+  return { height: rows*lineH + (rows-1)*rowGap, rows };
+}
+
+
+
+async function makeAndDownload(){
+  try{
+    if (!lastState){
+      alert('請先按「啟動儀式」產生今日結果，再生成分享圖。');
+      return;
+    }
+    const canvas = drawShareCard(lastState);
+    const a = document.createElement('a');
+    a.download = `DailyWish_${lastState.date}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }catch(e){
+    alert('產生分享圖失敗：' + (e && e.message ? e.message : e));
+  }
+}
+
+
+
+  /* ===================== 事件與快捷鍵 ===================== */
+  document.getElementById('start').addEventListener('click', run);
+  document.getElementById('share').addEventListener('click', makeAndDownload);
+  document.getElementById('breath').addEventListener('click', ()=>startBreath());
+  document.getElementById('copy').addEventListener('click', async ()=>{
+    try{
+      await navigator.clipboard.writeText($log.textContent||'');
+      $copy.textContent = '已複製';
+      setTimeout(()=>{$copy.textContent='複製結果（C）'},1200);
+    }catch{ alert('無法複製，瀏覽器可能未授權。'); }
+  });
+  document.getElementById('clear').addEventListener('click', ()=>{
+    $wish.value=''; $author.value=''; localStorage.removeItem('daily-wish'); localStorage.removeItem('daily-author');
+    $wishView.textContent=''; $nums.innerHTML=''; clearBreath();
+    $sw.style.background='transparent'; $cname.textContent='—'; $chex.textContent='—'; $chsl.textContent='—'; $log.textContent='';
+    lastState=null;
+  });
+
+  // 祈願輸入 Enter 啟動；Shift+Enter 換行
+  $wish.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault(); run();
+    }
+  });
+
+  // 全域快捷
+  window.addEventListener('keydown', (e)=>{
+    const k = e.key.toLowerCase();
+    if (k === 'enter' || k === 'r'){ run(); }
+    if (k === 'c'){ $copy.click(); }
+    if (k === 'x'){ $clear.click(); }
+    if (k === 'b'){ startBreath(); }
+    if (k === 'p'){ makeAndDownload(); }
+  });
+
+  // 初次載入不自動跑；若要開頁即顯示，取消註解下一行
+  // run();
+</script>
+<script>
+  /* === 安全護欄：任何錯誤立刻顯示（可留著做偵錯） === */
+  window.addEventListener('error', e => {
+  alert(`Script error: ${e.message}\n@ ${e.filename}:${e.lineno}:${e.colno}`);
+});
+
+  window.addEventListener('unhandledrejection', e => { console.error(e.reason); alert('Promise error: '+ e.reason) });
+  
+  /* === AdviceKit：小語 / 詳解（獨立命名空間，不汙染你的程式） === */
+  (function (root) {
+    // 工具：避免舊版瀏覽器踩到新語法
+    function toLower(s){ return (s||'').toString().toLowerCase(); }
+  
+    function explainColor(c){
+      var h=c.h, s=c.s, l=c.l;
+      var H=((h%360)+360)%360, tone='';
+      if (H<15||H>=345) tone='行動 / 勇氣';
+      else if (H<45)    tone='拓展 / 自信';
+      else if (H<90)    tone='學習 / 創意';
+      else if (H<150)   tone='關係 / 療癒';
+      else if (H<210)   tone='秩序 / 穩定';
+      else if (H<255)   tone='理性 / 溝通';
+      else if (H<300)   tone='洞察 / 靈感';
+      else              tone='直覺 / 內省';
+      var sat = (s>=70)?'外放熱情':(s<=55?'內斂沉著':'平衡溫和');
+      var lig = (l>=58)?'展開與交流':(l<=45?'聚焦與沉澱':'穩態推進');
+      return {tone:tone, sat:sat, lig:lig};
+    }
+  
+    function explainNumbers(nums){
+  var lenCnt={1:0,2:0,3:0,4:0}, parity={odd:0,even:0}, flags=[];
+  for (var i=0;i<nums.length;i++){
+    var n=nums[i], s=String(n), L=s.length;
+    lenCnt[L]++;
+
+    if (n % 2 === 0) {
+      parity.even++;
+    } else {
+      parity.odd++;
+    }
+
+    if (s === s.split('').reverse().join('')) flags.push('回文');
+    if (/(\d)\1{1,}/.test(s))          flags.push('重複數字');
+  }
+
+  var entries=[[1,lenCnt[1]],[2,lenCnt[2]],[3,lenCnt[3]],[4,lenCnt[4]]];
+  entries.sort(function(a,b){return b[1]-a[1]});
+  var dom = String(entries[0][0]);
+
+  var tempo = (dom==='1') ? '簡化節奏、先做最重要的一件'
+            : (dom==='2') ? '雙向協作、結伴而行'
+            : (dom==='3') ? '循序推進、週期檢視'
+                           : '系統化建設、耐心打底';
+
+  var balance = (parity.odd===parity.even) ? '動靜均衡'
+               : (parity.odd>parity.even) ? '行動偏多' : '穩定偏多';
+
+  if (flags.length){
+    var seen={}, uniq=[];
+    for (var j=0;j<flags.length;j++){ if(!seen[flags[j]]){ seen[flags[j]]=1; uniq.push(flags[j]); } }
+    balance += '；符號：' + uniq.join('、');
+  }
+  return { tempo:tempo, balance:balance };
+}
+
+  
+    function explainWish(text){
+      var t = toLower(text);
+      var dict = [
+        {k:['愛','桃花','關係','另一半','伴侶','相遇'], tag:'感情'},
+        {k:['合作','同事','客戶','人脈','團隊'],         tag:'人際 / 合作'},
+        {k:['學習','考試','研究','進修'],                 tag:'學習'},
+        {k:['工作','升遷','專案','績效','offer'],         tag:'事業'},
+        {k:['財','收入','金錢','理財'],                   tag:'財務'},
+        {k:['健康','身體','休息','睡眠'],                  tag:'健康'},
+        {k:['平穩','順利','心安','心境'],                  tag:'心境'}
+      ];
+      for (var i=0;i<dict.length;i++){
+        var hit=false, arr=dict[i].k;
+        for (var j=0;j<arr.length;j++){ if (t.indexOf(arr[j])>-1){ hit=true; break; } }
+        if (hit) return dict[i].tag;
+      }
+      return '通用';
+    }
+  
+    function buildAdviceRich(color, numbers, wishText){
+      var C = explainColor(color);
+      var N = explainNumbers(numbers);
+      var topic = explainWish(wishText);
+  
+      // 兩句小語（I～III 混合）
+      var s1 = (C.lig.indexOf('展開')>-1)?'打開連結':'沉穩聚焦';
+      var s2 = (C.sat.indexOf('外放')>-1)?'展現熱忱':(C.sat.indexOf('內斂')>-1?'保留能量':'柔中帶剛');
+      var short = s1 + '・' + s2;
+  
+      var detail =
+        '今日基調：'+ C.tone +'；'+ C.sat +'，'+ C.lig + '\n' +
+        '行動節拍：'+ N.tempo +'；'+ N.balance + '\n' +
+        '主題落點：'+ topic + '\n' +
+        '微提示：最小可行步驟（MINI STEP）＋ 指定一位人名或場域，今天就去互動';
+  
+      return { short: short, detail: detail };
+    }
+  
+    root.AdviceKit = { explainColor:explainColor, explainNumbers:explainNumbers, explainWish:explainWish, buildAdviceRich:buildAdviceRich };
+  })(window);
+  </script>
+  
+</body>
+</html>
