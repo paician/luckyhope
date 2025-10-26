@@ -183,8 +183,26 @@
   </div>
 
 <script>
-  window.addEventListener('error', e => alert('Script error: ' + e.message));
-window.addEventListener('unhandledrejection', e => alert('Promise error: ' + e.reason));
+// 僅在 URL 有 ?debug=1 時才彈窗；否則只寫到 console
+  const DEBUG = new URLSearchParams(location.search).has('debug');
+
+  window.addEventListener('error', (e) => {
+    const src = e.filename || '';
+    const fromExtension =
+      src.startsWith('chrome-extension://') || src.startsWith('moz-extension://');
+    if (fromExtension) return; // 忽略瀏覽器外掛的錯誤（含 MetaMask）
+    const msg = `Script error: ${e.message}\n@ ${src}:${e.lineno}:${e.colno}`;
+    if (DEBUG) alert(msg); else console.warn(msg);
+  });
+
+  window.addEventListener('unhandledrejection', (e) => {
+    // 訊息字串化
+    const msg = String(e && (e.reason?.message || e.reason || ''));
+    // 忽略常見錢包/外掛噪音
+    if (/metamask|ethereum|wallet|chrome-extension|moz-extension/i.test(msg)) return;
+    if (DEBUG) alert('Promise error: ' + msg);
+    else console.warn('Promise error:', msg);
+  });
 
   /* ===================== 參數與工具 ===================== */
   const RANGE_MIN = 1, RANGE_MAX = 999999999;
@@ -757,4 +775,5 @@ async function makeAndDownload(){
   
 </body>
 </html>
+
 
